@@ -18,7 +18,7 @@ def train_production_model():
     """Production model training function"""
     
     # Load data from production catalog
-    df = spark.table("unum_prod_catalag_demo.churn_project.customer_churn").toPandas()
+    df = spark.table("unum_prod_catalog_demo.churn_project.customer_churn").toPandas()
     mlflow.set_experiment("/Shared/mlops_demo/churn_prediction")
     # Feature engineering (same logic as dev)
     df_processed = df.copy()
@@ -63,7 +63,7 @@ def train_production_model():
         
         # Register model to Unity Catalog
         model_name = "churn_model"
-        register_model_name = "unum_prod_catalag_demo.churn_project.churn_model"
+        register_model_name = "unum_prod_catalog_demo.churn_project.churn_model"
 
         mlflow.sklearn.log_model(
             pipeline, 
