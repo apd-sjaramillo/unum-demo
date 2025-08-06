@@ -42,7 +42,7 @@ jobs:
       run: |
         databricks bundle run --target dev unum_demo_training_pipeline
 
-    - name: Run training pipeline
+    - name: Run promotion pipeline
       run: |
         databricks bundle run --target dev unum_demo_promotion_pipeline
 

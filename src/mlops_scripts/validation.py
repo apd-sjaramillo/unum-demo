@@ -8,9 +8,8 @@ model_alias = "Challenger"
 
 print(f"🧪 Validating Model: {model_name}@{model_alias}")
 print(f"📊 Validation Dataset: {validation_dataset}")
-
+mlflow.set_registry_uri('databricks-uc')
 client = MlflowClient()
-mlflow.set_registry_uri('databricks')
 
 ## Load Data and Model
 
