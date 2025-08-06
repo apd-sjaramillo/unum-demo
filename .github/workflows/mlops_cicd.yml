@@ -49,6 +49,9 @@ jobs:
   deploy-prod:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
+    env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_PROD_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_PROD_TOKEN }}
     # environment: prod
     
     steps:
@@ -63,17 +66,15 @@ jobs:
     - name: Install Databricks CLI
       run: |
         curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
-        
+
     - name: Deploy to Prod
-      env:
-        DATABRICKS_HOST: ${{ secrets.DATABRICKS_PROD_HOST }}
-        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_PROD_TOKEN }}
       run: |
         databricks bundle deploy --target prod
         
-    - name: Run training job (optional)
-      env:
-        DATABRICKS_HOST: ${{ secrets.DATABRICKS_PROD_HOST }}
-        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_PROD_TOKEN }}
+    - name: Run training pipeline
       run: |
-        databricks bundle run unum_demo_training_pipeline --target prod
+        databricks bundle run --target prod unum_demo_training_pipeline
+
+    - name: Run promotion pipeline
+      run: |
+        databricks bundle run --target prod unum_demo_promotion_pipeline
