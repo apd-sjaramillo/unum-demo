@@ -20,6 +20,7 @@ def train_production_model():
     # Load data from production catalog
     df = spark.table("unum_prod_catalog_demo.churn_project.customer_churn").toPandas()
     mlflow.set_experiment("/Shared/mlops_demo/churn_prediction")
+    mlflow.set_registry_uri('databricks-uc')
     # Feature engineering (same logic as dev)
     df_processed = df.copy()
     df_processed['charges_per_month'] = df_processed['total_charges'] / (df_processed['tenure'] + 1)
