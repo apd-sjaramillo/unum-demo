@@ -38,16 +38,9 @@ jobs:
       run: |
         databricks bundle deploy --target dev
         
-    - name: Comment PR with deployment info
-      uses: actions/github-script@v7
-      with:
-        script: |
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: '🚀 Deployed to **DEV** environment\n\nWorkflow: `unum-demo-training-pipeline`'
-          })
+    - name: Run training pipeline
+      run: |
+        databricks bundle run --target dev unum_demo_training_pipeline
 
   deploy-prod:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
