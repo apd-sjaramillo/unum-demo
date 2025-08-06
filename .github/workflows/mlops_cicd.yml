@@ -1,0 +1,78 @@
+name: Deploy Databricks Asset Bundle
+
+on:
+  pull_request:
+    branches: [develop]
+    types: [opened, synchronize, reopened]
+  
+  push:
+    branches: [develop, main]
+
+jobs:
+  deploy-dev:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    # environment: dev
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install Databricks CLI
+      run: |
+        curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+        
+    - name: Deploy to Dev
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_DEV_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
+      run: |
+        databricks bundle deploy --target dev
+        
+    - name: Comment PR with deployment info
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '🚀 Deployed to **DEV** environment\n\nWorkflow: `unum-demo-training-pipeline`'
+          })
+
+  deploy-prod:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    # environment: prod
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install Databricks CLI
+      run: |
+        curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+        
+    - name: Deploy to Prod
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_PROD_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_PROD_TOKEN }}
+      run: |
+        databricks bundle deploy --target prod
+        
+    - name: Run training job (optional)
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_PROD_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_PROD_TOKEN }}
+      run: |
+        databricks bundle run unum_demo_training_pipeline --target prod

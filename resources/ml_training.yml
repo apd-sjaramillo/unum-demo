@@ -1,0 +1,22 @@
+resources:
+  jobs:
+    unum_demo_training_pipeline:
+      name: unum-demo-training-pipeline
+      tasks:
+        - task_key: training
+          spark_python_task:
+            python_file: ../src/mlops_scripts/training.py
+          existing_cluster_id: 0806-003959-6dhz91qo
+      job_clusters:
+        - job_cluster_key: training_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: 16.4.x-scala2.12
+            aws_attributes:
+              availability: SPOT_WITH_FALLBACK
+            node_type_id: r6id.xlarge
+            spark_env_vars:
+              PYSPARK_PYTHON: /databricks/python3/bin/python3
+            num_workers: 1
+      queue:
+        enabled: true
