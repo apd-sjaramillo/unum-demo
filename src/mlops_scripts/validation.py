@@ -10,6 +10,7 @@ print(f"🧪 Validating Model: {model_name}@{model_alias}")
 print(f"📊 Validation Dataset: {validation_dataset}")
 
 client = MlflowClient()
+mlflow.set_registry_uri('databricks-uc')
 
 ## Load Data and Model
 

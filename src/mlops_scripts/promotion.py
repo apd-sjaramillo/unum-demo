@@ -11,6 +11,7 @@ print(f"🧪 Validating Model: {model_name}@{model_alias}")
 print(f"📊 Validation Dataset: {validation_dataset}")
 
 client = MlflowClient()
+mlflow.set_registry_uri('databricks-uc')
 model_details = client.get_model_version_by_alias(model_name, model_alias)
 
 # Set Champion alias
