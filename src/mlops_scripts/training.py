@@ -66,11 +66,22 @@ def train_production_model():
         model_name = "churn_model"
         register_model_name = "unum_prod_catalog_demo.churn_project.churn_model"
 
-        mlflow.sklearn.log_model(
+        model_info=mlflow.sklearn.log_model(
             pipeline, 
             "model",
             registered_model_name=register_model_name,
             input_example=X_train.iloc[:5],
+        )
+        client = mlflow.MlflowClient()
+        client.update_model_version(
+        name=register_model_name,
+        version=model_info.registered_model_version,
+        description="Customer churn prediction model using logistic regression with feature engineering including charges per month, customer tenure, and contract type encoding."
+        )
+        client.set_registered_model_alias(
+            name=register_model_name,
+            alias="Challenger",  # or "Champion", "Staging", etc.
+            version=model_info.registered_model_version,
         )
         
         return run.info.run_id, model_name
