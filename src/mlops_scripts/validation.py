@@ -1,6 +1,3 @@
-!pip install --upgrade typing_extensions mlflow
-dbutils.library.restartPython()
-
 import mlflow
 from mlflow import MlflowClient
 from pyspark.sql.functions import col
