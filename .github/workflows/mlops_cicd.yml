@@ -12,6 +12,9 @@ jobs:
   deploy-dev:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_DEV_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
     # environment: dev
     
     steps:
@@ -26,11 +29,12 @@ jobs:
     - name: Install Databricks CLI
       run: |
         curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+    - name: Validate bundle
+      run: |
+        databricks bundle validate --target dev
         
     - name: Deploy to Dev
-      env:
-        DATABRICKS_HOST: ${{ secrets.DATABRICKS_DEV_HOST }}
-        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
       run: |
         databricks bundle deploy --target dev
         
