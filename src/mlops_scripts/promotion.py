@@ -31,3 +31,4 @@ client.set_model_version_tag(
 )
 
 print(f"✅ Model promoted: {model_name}@Champion")
+print(f"Model version {model_details.version}")
