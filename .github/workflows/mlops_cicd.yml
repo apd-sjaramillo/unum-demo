@@ -2,11 +2,11 @@ name: Deploy Databricks Asset Bundle
 
 on:
   pull_request:
-    branches: [develop]
+    branches: [main]
     types: [opened, synchronize, reopened]
   
   push:
-    branches: [develop, main]
+    branches: [main]
 
   workflow_dispatch:
     inputs:
