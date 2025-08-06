@@ -40,7 +40,11 @@ jobs:
         
     - name: Run training pipeline
       run: |
-        databricks bundle run --target dev unum_demo_training_pipeline
+        databricks bundle run --target dev unum-demo-training-pipeline
+
+    - name: Run training pipeline
+      run: |
+        databricks bundle run --target dev unum-demo-training-pipeline
 
   deploy-prod:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
