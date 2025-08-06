@@ -1,0 +1,17 @@
+resources:
+  jobs:
+    unum_demo_promotion_pipeline:
+      name: unum-demo-promotion-pipeline
+      tasks:
+        - task_key: validation
+          spark_python_task:
+            python_file: ../src/mlops_scripts/validation.py
+          existing_cluster_id: 0806-003959-6dhz91qo
+        - task_key: promotion
+          depends_on:
+            - task_key: validation
+          spark_python_task:
+            python_file: ../src/mlops_scripts/promotion.py
+          existing_cluster_id: 0806-003959-6dhz91qo
+      queue:
+        enabled: true
