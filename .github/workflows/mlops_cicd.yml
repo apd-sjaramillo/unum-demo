@@ -8,6 +8,22 @@ on:
   push:
     branches: [develop, main]
 
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+      run_pipelines:
+        description: 'Run training and promotion pipelines after deployment'
+        required: false
+        default: true
+        type: boolean
+
 jobs:
   deploy-dev:
     if: github.event_name == 'pull_request'
