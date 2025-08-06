@@ -1,0 +1,96 @@
+name: Deploy Databricks Asset Bundle
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  
+  push:
+    branches: [main]
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+      run_pipelines:
+        description: 'Run training and promotion pipelines after deployment'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  deploy-dev:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_DEV_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
+    # environment: dev
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install Databricks CLI
+      run: |
+        curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+    - name: Validate bundle
+      run: |
+        databricks bundle validate --target dev
+        
+    - name: Deploy to Dev
+      run: |
+        databricks bundle deploy --target dev
+        
+    - name: Run training pipeline
+      run: |
+        databricks bundle run --target dev unum_demo_training_pipeline
+
+    - name: Run promotion pipeline
+      run: |
+        databricks bundle run --target dev unum_demo_promotion_pipeline
+
+  deploy-prod:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_PROD_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_PROD_TOKEN }}
+    # environment: prod
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install Databricks CLI
+      run: |
+        curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+    - name: Deploy to Prod
+      run: |
+        databricks bundle deploy --target prod
+        
+    - name: Run training pipeline
+      run: |
+        databricks bundle run --target prod unum_demo_training_pipeline
+
+    - name: Run promotion pipeline
+      run: |
+        databricks bundle run --target prod unum_demo_promotion_pipeline
